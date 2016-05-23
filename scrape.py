@@ -4,19 +4,21 @@ import urllib
 import re
 import sys
 
+# Print title
 title = 'Show Scraper'
 print title.center(100, ' ')
-print
-'----------------------------------------------------------------------------------------------\n'
+print '----------------------------------------------------------------------------------------------\n'
 
+# Set base URLs
 SITE_URL = "http://www.couchtuner.ag"
 LIST_URL = "http://www.couchtuner.ag/tv-lists"
 user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
 
-regex = re.compile('\n^(.*?):(.*?)$|,', re.MULTILINE)
 
 def makeSoup(url):
-
+    '''
+    Make soup for a given URL
+    '''
     hdr = {'User-Agent': user_agent,
            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             }
@@ -27,7 +29,10 @@ def makeSoup(url):
 
 
 def getSeries(listUrl):
-
+    '''
+    Get the series name from user
+    Returns URL of series's season listing
+    '''
     soup = makeSoup(listUrl)
     foundSeries = False
     while foundSeries is False:
@@ -44,7 +49,10 @@ def getSeries(listUrl):
 
 
 def getEpisodeList(seriesUrl):
-
+    '''
+    Get the season number from user
+    Returns list of episode URLs & names
+    '''
     soup = makeSoup(seriesUrl)
     foundSeason = False
     while foundSeason is False:
@@ -68,7 +76,10 @@ def getEpisodeList(seriesUrl):
 
 
 def getEpisodeVideo(ep):
-
+    '''
+    Given an episode URL and text
+    Download the video from AllMyV/AllMyVid
+    '''
     epUrl = ep['url']
     epText = ep['text']
 
@@ -117,8 +128,10 @@ def getEpisodeVideo(ep):
     return
 
 
-srsUrl = SITE_URL + getSeries(LIST_URL)
-episodeList = getEpisodeList(srsUrl)[::-1]
+srsUrl = SITE_URL + getSeries(LIST_URL) # Get series URL
+episodeList = getEpisodeList(srsUrl)[::-1] # Reverse episode listing to go from 1-n
 print
 for ep in episodeList:
-    getEpisodeVideo(ep)   
+    getEpisodeVideo(ep) # Get the video for episode ep
+
+print 'Download completed!\n\n'
