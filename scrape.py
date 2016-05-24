@@ -122,8 +122,26 @@ def getEpisodeVideo(ep):
 
     vidDlUrl = listVidUrl[-1]
     filename = epText + '.mp4'
+    response = urlopen(vidDlUrl)
+    CHUNK = 1024 * 1024
+    file_size_dl = 0
+    meta = response.info()
+    file_size = int(meta.getheaders("Content-Length")[0])
+    print "Total Bytes:", file_size
+
     with open(filename, 'wb') as f:
-        urllib.urlretrieve(vidDlUrl, filename, reporthook=dlProgress)
+        while True:
+            chunk = response.read(CHUNK)
+            if not chunk:
+                break
+            file_size_dl += len(chunk)
+            f.write(chunk)
+            percent = file_size_dl*100/file_size
+            sys.stdout.write("Downloading " + epText + " ... %d%%" % percent)
+            sys.stdout.write("\tDownloaded bytes: " + str(file_size_dl))
+            sys.stdout.flush()
+            print '\r',
+        # urllib.urlretrieve(vidDlUrl, filename, reporthook=dlProgress)
     print
     return
 
